@@ -1,0 +1,12 @@
+<launch>
+	<node pkg="key_stroke_pub" exec="keypub" name="keyboard"/>
+	<node pkg="swarm" exec="swarm_virtual_leader" name="virtual" >
+		<remap from="/keystrokes" to="/keys"/>
+	</node>
+	<node pkg="swarm" exec="swarm_node" name="node">
+		<remap from="/pos_leader" to="/leader_pos"/>
+	</node>
+	<node pkg="swarm" exec="swarm_viz" name="viz">
+	</node>
+</launch>
+

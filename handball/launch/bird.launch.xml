@@ -1,0 +1,66 @@
+<launch>
+	<let name="kp_red_swarm" value="0.05"/>
+	<let name="kp_blue_swarm" value="0.2"/>
+	
+	<node pkg="swarm" exec="swarm_virtual_leader" name="red_leader" >
+		<param name="color" value="red"/>
+	</node>
+	<node pkg="swarm" exec="swarm_node" name="red_1">
+		<param name="id" value="1" />
+		<param name="color" value="red"/>
+		<param name="kp" value="$(var kp_red_swarm)"/>
+	</node>
+	<node pkg="swarm" exec="swarm_node" name="red_2">
+		<param name="id" value="2" />
+		<param name="color" value="red"/>
+		<param name="kp" value="$(var kp_red_swarm)"/>
+	</node>
+	<node pkg="swarm" exec="swarm_node" name="red_3">
+		<param name="id" value="3" />
+		<param name="color" value="red"/>
+		<param name="kp" value="$(var kp_red_swarm)"/>
+	</node>
+	<node pkg="swarm" exec="swarm_node" name="red_4">
+		<param name="id" value="4" />
+		<param name="color" value="red"/>
+		<param name="kp" value="$(var kp_red_swarm)"/>
+	</node>
+	<node pkg="swarm" exec="swarm_node" name="red_5">
+		<param name="id" value="5" />
+		<param name="color" value="red"/>
+		<param name="kp" value="$(var kp_red_swarm)"/>
+	</node>
+	
+	<node pkg="swarm" exec="swarm_virtual_leader" name="blue_leader" >
+		<param name="color" value="blue"/>
+	</node>
+	<node pkg="swarm" exec="swarm_node" name="blue_1">
+		<param name="id" value="1" />
+		<param name="color" value="blue"/>
+		<param name="kp" value="$(var kp_blue_swarm)"/>
+		
+	</node>
+	<node pkg="swarm" exec="swarm_node" name="blue_2">
+		<param name="id" value="2" />
+		<param name="color" value="blue"/>
+		<param name="kp" value="$(var kp_blue_swarm)"/>
+	</node>
+	<node pkg="swarm" exec="swarm_node" name="blue_3">
+		<param name="id" value="3" />
+		<param name="color" value="blue"/>
+		<param name="kp" value="$(var kp_blue_swarm)"/>
+		
+	</node>
+	<node pkg="swarm" exec="swarm_node" name="blue_4">
+		<param name="id" value="4" />
+		<param name="color" value="blue"/>
+		<param name="kp" value="$(var kp_blue_swarm)"/>
+	</node>
+	<node pkg="swarm" exec="swarm_node" name="blue_5">
+		<param name="id" value="5" />
+		<param name="color" value="blue"/>
+		<param name="kp" value="$(var kp_blue_swarm)"/>	
+	</node>
+	<node pkg="swarm" exec="swarm_viz" name="viz">
+	</node>
+</launch>	
