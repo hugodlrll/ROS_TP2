@@ -1,1 +1,5 @@
 handball_msgs/build
+handball/build
+install
+log
+build

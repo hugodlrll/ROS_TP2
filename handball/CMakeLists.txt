@@ -9,9 +9,6 @@ endif()
 # Find required packages
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(visualization_msgs REQUIRED)
-find_package(std_msgs REQUIRED)
-find_package(geometry_msgs REQUIRED)
 find_package(handball_msgs REQUIRED)
 
 # Include headers (if you create include/ directory)
@@ -19,7 +16,7 @@ find_package(handball_msgs REQUIRED)
 
 # === Executables ===
 
-add_executable(coach coach/.cpp)
+add_executable(coach src/coach.cpp)
 ament_target_dependencies(coach
   rclcpp
   handball_msgs

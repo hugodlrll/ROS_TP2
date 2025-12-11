@@ -1,0 +1,3 @@
+<launch>
+    <node pkg="handball" exec="coach"></node>
+</launch>
