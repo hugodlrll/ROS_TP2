@@ -1,8 +1,0 @@
-string team   # Equipe concernee par le changement
-uint8 outgoing            # Numero dans l'equipe du joueur sortant
-uint8 incoming            # Numero dans l'equipe du joueur entrant
----
-uint8 GRANTED = 0         # Changement autorise
-uint8 NO_SUCH_PLAYER = 1  # Le joueur demande n'est pas sur le terrain
-uint8 NO_MORE_SUBS = 2    # Le coach a deja utilise tous ses changements
-uint8 status              # Resultat de la requete
