@@ -1,3 +1,15 @@
 <launch>
-    <node pkg="handball" exec="coach"></node>
+    <group>
+        <let name="team_color" value="blue"/>
+
+        <push-ros-namespace namespace="$(var team_color)"/>
+        <node pkg="handball" exec="coach" name="coach_$(var team_color)"></node>
+    </group>
+
+    <group>
+        <let name="team_color" value="red"/>
+
+        <push-ros-namespace namespace="$(var team_color)"/>
+        <node pkg="handball" exec="coach" name="coach_$(var team_color)"></node>
+    </group>
 </launch>
