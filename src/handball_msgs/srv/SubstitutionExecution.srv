@@ -1,0 +1,4 @@
+uint8 outgoing            # Number of concerned player (will recharge his energy level to 100%).
+---
+uint8 DONE = 0            # Substitution done.
+uint8 status              # Result of request (will be set to DONE)

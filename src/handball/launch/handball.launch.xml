@@ -12,4 +12,9 @@
         <push-ros-namespace namespace="$(var team_color)"/>
         <node pkg="handball" exec="coach" name="coach_$(var team_color)"></node>
     </group>
+
+    <node pkg="handball" exec="referee" name="referee" output="screen">
+        <!--  Paramètres fixés directement  -->
+        <param name="match_duration" value="600"/>
+    </node>
 </launch>

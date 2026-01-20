@@ -13,11 +13,14 @@
 #include "handball_msgs/msg/player_state.hpp"
 #include "handball_msgs/msg/coach_instruction.hpp"
 #include "handball_msgs/srv/substitution_approval.hpp"
+#include "handball_msgs/srv/substitution_execution.hpp"
 
 using namespace std::chrono_literals;
 
 using std::placeholders::_1;
-using SubstitutionSrv = handball_msgs::srv::SubstitutionApproval;
+using SubstitutionApprovalSrv = handball_msgs::srv::SubstitutionApproval;
+using SubstitutionExecutionSrv = handball_msgs::srv::SubstitutionExecution;
+
 
 class Coach : public rclcpp::Node
 {
@@ -29,7 +32,7 @@ public:
 
     // Subscriptions
     ball_sub_ = this->create_subscription<handball_msgs::msg::BallState>(
-      "ball_state",
+      "/ball_state",
       qos,
       std::bind(&Coach::ball_callback, this, _1)
     );
@@ -46,7 +49,8 @@ public:
       qos
     );
 
-    subApp_cli_ = create_client<SubstitutionSrv>("substitution_approval");
+    subApp_cli_ = create_client<SubstitutionApprovalSrv>("/substitution_approval");
+    subEx_cli_ = create_client<SubstitutionExecutionSrv>("/substitution_execution");
 
     RCLCPP_INFO(this->get_logger(), "Coach node started: subscribing to 'ball_state' and 'player_state', publishing on 'coach_instruction'");
   }
@@ -73,7 +77,7 @@ private:
     handball_msgs::msg::CoachInstruction inst;
     if (msg->energie < 20.0) {
       inst.instr = "REQUEST PLAYER CHANGER : rest";
-      request_substitution(msg->team, static_cast<uint8_t>(msg->id), fallback_incoming_id_);
+      request_substitution(msg->team, static_cast<uint8_t>(msg->id), static_cast<uint8_t>(msg->id));
     } else {
       inst.instr = "KEEP_GOING: good energy";
     }
@@ -85,38 +89,38 @@ private:
   void request_substitution(const std::string & team, uint8_t outgoing, uint8_t incoming)
   {
     if (!subApp_cli_) {
-      RCLCPP_WARN(this->get_logger(), "Substitution client not initialized");
+      RCLCPP_WARN(this->get_logger(), "SubstitutionApproval client not initialized");
       return;
     }
 
     // Wait briefly for the service to be available, avoid hard failure if server is late
     if (!subApp_cli_->wait_for_service(1s)) {
-      RCLCPP_WARN(this->get_logger(), "Substitution service unavailable, will retry later");
+      RCLCPP_WARN(this->get_logger(), "SubstitutionApproval service unavailable, will retry later");
       return;
     }
 
-    auto req = std::make_shared<SubstitutionSrv::Request>();
+    auto req = std::make_shared<SubstitutionApprovalSrv::Request>();
     req->team = team;
     req->outgoing = outgoing;
     req->incoming = incoming;
 
     auto future = subApp_cli_->async_send_request(
       req,
-      [this, outgoing, incoming](rclcpp::Client<SubstitutionSrv>::SharedFuture resp) {
-        if (!resp) {
+      [this, outgoing, incoming](rclcpp::Client<SubstitutionApprovalSrv>::SharedFuture resp) {
+        if (!resp.valid()) {
           RCLCPP_WARN(this->get_logger(), "Substitution response invalid");
           return;
         }
 
         const auto status = resp.get()->status;
         switch (status) {
-          case SubstitutionSrv::Response::GRANTED:
+          case SubstitutionApprovalSrv::Response::GRANTED:
             RCLCPP_INFO(this->get_logger(), "Substitution granted: out=%u in=%u", outgoing, incoming);
             break;
-          case SubstitutionSrv::Response::NO_SUCH_PLAYER:
+          case SubstitutionApprovalSrv::Response::NO_SUCH_PLAYER:
             RCLCPP_WARN(this->get_logger(), "Substitution refused (no such player): out=%u", outgoing);
             break;
-          case SubstitutionSrv::Response::NO_MORE_SUBS:
+          case SubstitutionApprovalSrv::Response::NO_MORE_SUBS:
             RCLCPP_WARN(this->get_logger(), "Substitution refused (no more subs): out=%u in=%u", outgoing, incoming);
             break;
           default:
@@ -129,11 +133,49 @@ private:
     (void)future;  // keep future alive until callback completes
   }
 
+  void execute_substitution(uint8_t outgoing) {
+    if (!subEx_cli_) {
+      RCLCPP_WARN(this->get_logger(), "SubstitutionExecution client not initialized");
+      return;
+    }
+
+    // Wait briefly for the service to be available, avoid hard failure if server is late
+    if (!subEx_cli_->wait_for_service(1s)) {
+      RCLCPP_WARN(this->get_logger(), "SubstitutionExecution service unavailable, will retry later");
+      return;
+    }
+
+    auto req = std::make_shared<SubstitutionExecutionSrv::Request>();
+    req->outgoing = outgoing;
+
+    auto future = subEx_cli_->async_send_request(
+      req,
+      [this, outgoing](rclcpp::Client<SubstitutionExecutionSrv>::SharedFuture resp) {
+          if (!resp.valid()) {
+            RCLCPP_WARN(this->get_logger(), "Substitution response invalid");
+            return;
+          }
+
+          const auto status = resp.get()->status;
+          switch (status) {
+            case SubstitutionExecutionSrv::Response::DONE:
+              RCLCPP_INFO(this->get_logger(), "SubstitutionExecution succeeded  : %u is out", outgoing);
+              break;
+            default:
+              RCLCPP_WARN(this->get_logger(), "SubstitutionExecution service unavailable, will retry later");
+              break;
+          }
+      }
+    );
+
+    (void)future;
+  }
+
   rclcpp::Subscription<handball_msgs::msg::BallState>::SharedPtr ball_sub_;
   rclcpp::Subscription<handball_msgs::msg::PlayerState>::SharedPtr player_sub_;
   rclcpp::Publisher<handball_msgs::msg::CoachInstruction>::SharedPtr instr_pub_;
-  rclcpp::Client<SubstitutionSrv>::SharedPtr subApp_cli_;
-  uint8_t fallback_incoming_id_ {0};
+  rclcpp::Client<SubstitutionApprovalSrv>::SharedPtr subApp_cli_;
+  rclcpp::Client<SubstitutionExecutionSrv>::SharedPtr subEx_cli_;
 };
 
 int main(int argc, char **argv)

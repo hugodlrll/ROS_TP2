@@ -19,17 +19,17 @@ find_package(rosidl_default_generators REQUIRED)
 
 # Generate messages, services and actions with type support
 rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/BallPosition.msg"
-  "msg/BallState.msg"
-  "msg/BallVelocity.msg"
-  "msg/CoachInstruction.msg"
-  "msg/PlanarTwist.msg"
-  "msg/PlayerControl.msg"
-  "msg/PlayerState.msg"
-  "msg/Posture.msg"
+"msg/BallPosition.msg"
   "msg/Whistle.msg"
+  "msg/CoachInstruction.msg"
+  "msg/Posture.msg"
+  "msg/PlanarTwist.msg"
+  "msg/BallVelocity.msg"
+  "msg/BallState.msg"
+  "msg/PlayerState.msg"
+  "msg/PlayerControl.msg"
   "srv/SubstitutionApproval.srv"
-  "action/SubstitutionExecution.action"
+  "srv/SubstitutionExecution.srv"
   DEPENDENCIES std_msgs geometry_msgs
 )
 

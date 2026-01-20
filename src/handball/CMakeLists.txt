@@ -8,6 +8,7 @@ endif()
 
 # Find required packages
 find_package(rclcpp REQUIRED)
+find_package(rclcpp_action REQUIRED)
 find_package(handball_msgs REQUIRED)
 
 # Include headers (if you create include/ directory)
@@ -16,14 +17,26 @@ find_package(handball_msgs REQUIRED)
 # === Executables ===
 
 add_executable(coach src/coach.cpp)
+add_executable(referee src/referee_amaury.cpp)
 ament_target_dependencies(coach
   rclcpp
+  handball_msgs
+)
+
+ament_target_dependencies(referee
+  rclcpp
+  rclcpp_action
   handball_msgs
 )
 
 # === Installation ===
 install(
   TARGETS coach
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+install(
+  TARGETS referee
   DESTINATION lib/${PROJECT_NAME}
 )
 
