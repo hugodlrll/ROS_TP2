@@ -6,6 +6,7 @@
     source install/setup.bash
 
     ros2 run node name
+    ros2 launch <nom_du_package> <nom_du_fichier_launch>
 
 3. Pour tester :
     Lancer rqt
@@ -13,7 +14,7 @@
 # Résumé séance 27/01/2026 #
 
 -> request substitution approval fonctionne pour le coach lorsqu'un joueur a une énergie inférieure à 20
--> En fonction de la balle, le coaach donne des ordres différents
+-> En fonction de la balle, le coach donne des ordres différents
 
 -> reponse subtitution approval ne fonctionne pas coté arbitre
 -> Le reste de l'arbitre n'a pas été testé pour le moment

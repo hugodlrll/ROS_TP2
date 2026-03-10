@@ -4,6 +4,21 @@
 
         <push-ros-namespace namespace="$(var team_color)"/>
         <node pkg="handball" exec="coach" name="coach_$(var team_color)"></node>
+        
+        <node pkg="handball" exec="player_node" name="player_0">
+            <param name="team" value="$(var team_color)"/>
+            <param name="player_id" value="0"/>
+        </node>
+
+        <node pkg="handball" exec="player_node" name="player_1">
+            <param name="team" value="$(var team_color)"/>
+            <param name="player_id" value="1"/>
+        </node>
+
+        <node pkg="handball" exec="player_node" name="player_2">
+            <param name="team" value="$(var team_color)"/>
+            <param name="player_id" value="2"/>
+        </node>
     </group>
 
     <group>
@@ -11,6 +26,22 @@
 
         <push-ros-namespace namespace="$(var team_color)"/>
         <node pkg="handball" exec="coach" name="coach_$(var team_color)"></node>
+
+        <node pkg="handball" exec="player_node" name="player_0">
+            <param name="team" value="$(var team_color)"/>
+            <param name="player_id" value="0"/>
+        </node>
+
+        <node pkg="handball" exec="player_node" name="player_1">
+            <param name="team" value="$(var team_color)"/>
+            <param name="player_id" value="1"/>
+        </node>
+
+        <node pkg="handball" exec="player_node" name="player_2">
+            <param name="team" value="$(var team_color)"/>
+            <param name="player_id" value="2"/>
+        </node>
+
     </group>
 
     <node pkg="handball" exec="referee" name="referee" output="screen">

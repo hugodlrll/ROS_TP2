@@ -10,6 +10,10 @@ endif()
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_action REQUIRED)
 find_package(handball_msgs REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(tf2_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
 
 # Include headers (if you create include/ directory)
 # include_directories(include)
@@ -23,11 +27,22 @@ ament_target_dependencies(coach
   handball_msgs
 )
 
+add_executable(player_node src/player_node.cpp)
+ament_target_dependencies(player_node
+  rclcpp
+  handball_msgs
+  geometry_msgs
+  tf2
+  tf2_ros
+  tf2_msgs
+)
+
 ament_target_dependencies(referee
   rclcpp
   rclcpp_action
   handball_msgs
 )
+
 
 # === Installation ===
 install(
@@ -43,6 +58,11 @@ install(
 install(
   DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}
+)
+
+install(TARGETS
+  player_node
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 # === Testing (optional) ===
