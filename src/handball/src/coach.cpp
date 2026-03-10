@@ -7,6 +7,7 @@
  */
 
 #include <memory>
+#include <cmath>
 #include <string>
 #include "rclcpp/rclcpp.hpp"
 #include "handball_msgs/msg/ball_state.hpp"
@@ -38,7 +39,7 @@ public:
     );
 
     player_sub_ = this->create_subscription<handball_msgs::msg::PlayerState>(
-      "player_state",
+      "/player_state",
       qos,
       std::bind(&Coach::player_callback, this, _1)
     );
@@ -116,6 +117,7 @@ private:
         switch (status) {
           case SubstitutionApprovalSrv::Response::GRANTED:
             RCLCPP_INFO(this->get_logger(), "Substitution granted: out=%u in=%u", outgoing, incoming);
+            execute_substitution(outgoing);
             break;
           case SubstitutionApprovalSrv::Response::NO_SUCH_PLAYER:
             RCLCPP_WARN(this->get_logger(), "Substitution refused (no such player): out=%u", outgoing);

@@ -11,6 +11,9 @@
 3. Pour tester :
     Lancer rqt
 
+    Rviz :
+    LIBGL_ALWAYS_SOFTWARE=1 ros2 run rviz2 rviz2
+
 # Résumé séance 27/01/2026 #
 
 -> request substitution approval fonctionne pour le coach lorsqu'un joueur a une énergie inférieure à 20

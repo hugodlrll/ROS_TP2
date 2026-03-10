@@ -14,6 +14,7 @@ find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
 
 # Include headers (if you create include/ directory)
 # include_directories(include)
@@ -21,13 +22,14 @@ find_package(geometry_msgs REQUIRED)
 # === Executables ===
 
 add_executable(coach src/coach.cpp)
-add_executable(referee src/referee_amaury.cpp)
+add_executable(referee src/referee.cpp)
+add_executable(player_node src/player_node.cpp)
+add_executable(ball src/ball.cpp)
 ament_target_dependencies(coach
   rclcpp
   handball_msgs
 )
 
-add_executable(player_node src/player_node.cpp)
 ament_target_dependencies(player_node
   rclcpp
   handball_msgs
@@ -41,7 +43,17 @@ ament_target_dependencies(referee
   rclcpp
   rclcpp_action
   handball_msgs
+  std_msgs
 )
+
+ament_target_dependencies(ball
+  tf2_ros
+  rclcpp
+  handball_msgs
+  geometry_msgs
+  std_msgs
+)
+
 
 
 # === Installation ===
@@ -55,14 +67,19 @@ install(
   DESTINATION lib/${PROJECT_NAME}
 )
 
-install(
-  DIRECTORY launch
-  DESTINATION share/${PROJECT_NAME}
-)
-
 install(TARGETS
   player_node
   DESTINATION lib/${PROJECT_NAME}
+)
+
+install(TARGETS
+  ball
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+install(
+  DIRECTORY launch
+  DESTINATION share/${PROJECT_NAME}
 )
 
 # === Testing (optional) ===

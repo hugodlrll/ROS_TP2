@@ -125,14 +125,14 @@ public:
     ball_pos_vit_received_ = false ;
     auto qos_settings = rclcpp::QoS(rclcpp::KeepLast(1)).best_effort().durability_volatile();
     ball_pos_vit_sub_ = this->create_subscription<handball_msgs::msg::BallState>(
-        "ball_pos_vit",
+        "/ball_state",
         qos_settings,
         std::bind(&PlayerNode::ball_pos_vit_callback, this, _1)
     );
     coach_instr_received_ = false ;
     qos_settings = rclcpp::QoS(rclcpp::KeepLast(1)).reliable().durability_volatile();
     coach_instr_sub_ = this->create_subscription<handball_msgs::msg::CoachInstruction>(
-        "coach_instr",
+        "coach_instruction",
         qos_settings,
         std::bind(&PlayerNode::coach_instr_callback, this, _1)
     );
@@ -146,7 +146,7 @@ public:
     whistle_received_ = false ;//referee
     qos_settings = rclcpp::QoS(rclcpp::KeepLast(1)).reliable().durability_volatile();
     whistle_sub_ = this->create_subscription<handball_msgs::msg::Whistle>(
-        "whistle",
+      "/whistle",
         qos_settings,
         std::bind(&PlayerNode::whistle_callback, this, _1)
     );
@@ -211,9 +211,9 @@ private:
 
     void player_control_callback(const handball_msgs::msg::PlayerControl::SharedPtr msg)
   {
-      RCLCPP_INFO_STREAM(this->get_logger(), "player control callback");
+      // RCLCPP_INFO_STREAM(this->get_logger(), "player control callback");
       if(!player_stop and energie_>0){
-        switch(msg->MOVE){
+        switch(msg->action){
             case 1: //movement
                 vx_ = msg->twist.vx;
                 vy_ = msg->twist.vy;
