@@ -5,6 +5,10 @@ from ament_index_python.packages import get_package_share_directory
 import os
 
 def create_team_group(team_color: str):
+    player_0_remappings = []
+    if team_color == "blue":
+        player_0_remappings = [("player_control", "player_0/player_control")]
+
     return GroupAction(
         actions=[
             PushRosNamespace(team_color),
@@ -18,6 +22,7 @@ def create_team_group(team_color: str):
                 executable="player_node",
                 name="player_0",
                 parameters=[{"team": team_color, "id": 0}],
+                remappings=player_0_remappings,
             ),
             Node(
                 package="handball",
@@ -73,5 +78,19 @@ def generate_launch_description():
                 name="ball",
                 output="screen",
             ),
+
+            Node(
+                package="joy",
+                executable="joy_node",
+                name="joystick",
+            ),
+
+            Node(
+                package="handball",
+                executable="controller",
+                name="controller",
+                remappings=[("player_control", "/blue/player_0/player_control")],
+            ),
+
         ]
     )
