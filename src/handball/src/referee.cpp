@@ -1,3 +1,14 @@
+/**
+ * @file referee.cpp
+ * @author Amaury LEJOLIVET
+ * @brief Simulate le 
+ * @version 0.1
+ * @date 2026-03-17
+ * 
+ * @copyright Copyright (c) 2026
+ * 
+ */
+
 #include <chrono>
 #include <cmath>
 #include <memory>

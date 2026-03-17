@@ -1,9 +1,13 @@
 /**
- * @class coach node
+ * @file coach.cpp
+ * @author Hugo DELARUELLE
  * @brief Simulates the behavior of a handball coach
- *
- * ### Description
- * The coach node simulates a handball coach that monitors the positions of players and give them some advices.
+ * @version 0.1
+ * @date 2026-03-17
+ * @details The coach node simulates a handball coach that monitors the positions of players and give them some advices.
+ * 
+ * @copyright Copyright (c) 2026
+ * 
  */
 
 #include <memory>

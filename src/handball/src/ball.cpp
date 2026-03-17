@@ -1,3 +1,14 @@
+/**
+ * @file ball.cpp
+ * @author Tommy ROYER
+ * @brief Simulate the behavior of a handball ball
+ * @version 0.1
+ * @date 2026-03-17
+ * 
+ * @copyright Copyright (c) 2026
+ * 
+ */
+
 #include <rclcpp/rclcpp.hpp>
 
 #include "handball_msgs/msg/ball_state.hpp"
