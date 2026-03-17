@@ -82,11 +82,11 @@ install(
   DESTINATION share/${PROJECT_NAME}
 )
 
-# === Testing (optional) ===
-# if(BUILD_TESTING)
-#   find_package(ament_lint_auto REQUIRED)
-#   ament_lint_auto_find_test_dependencies()
-# endif()
+install(
+  DIRECTORY urdf
+  DESTINATION share/${PROJECT_NAME}
+)
 
+#=== Ament package ===
 ament_package()
 

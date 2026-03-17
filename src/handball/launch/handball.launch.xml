@@ -1,4 +1,15 @@
 <launch>
+    <let name="pkg_share" value="$(find-pkg-share handball)"/>
+    <let name="xacro_file" value="$(var pkg_share)/urdf/multi_robots.xacro"/>
+
+    <let name="robot_description_content" value="$(command 'xacro $(var xacro_file)')"/>
+
+    <node pkg="robot_state_publisher" exec="robot_state_publisher" name="robot_state_publisher" output="screen">
+        <param name="robot_description" value="$(var robot_description_content)"/>
+    </node>
+
+    <node pkg="rviz2" exec="rviz2" name="rviz2" output="screen"/>
+
     <group>
         <let name="team_color" value="blue"/>
 

@@ -14,11 +14,7 @@
     Rviz :
     LIBGL_ALWAYS_SOFTWARE=1 ros2 run rviz2 rviz2
 
-# Résumé séance 27/01/2026 #
+# Description #
 
--> request substitution approval fonctionne pour le coach lorsqu'un joueur a une énergie inférieure à 20
--> En fonction de la balle, le coach donne des ordres différents
 
--> reponse subtitution approval ne fonctionne pas coté arbitre
--> Le reste de l'arbitre n'a pas été testé pour le moment
     
