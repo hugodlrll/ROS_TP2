@@ -57,23 +57,22 @@ public:
     subApp_cli_ = create_client<SubstitutionApprovalSrv>("/substitution_approval");
     subEx_cli_ = create_client<SubstitutionExecutionSrv>("/substitution_execution");
 
-    RCLCPP_INFO(this->get_logger(), "Coach node started: subscribing to 'ball_state' and 'player_state', publishing on 'coach_instruction'");
+    // RCLCPP_INFO(this->get_logger(), "Coach node started: subscribing to 'ball_state' and 'player_state', publishing on 'coach_instruction'");
   }
 
 private:
   void ball_callback(const handball_msgs::msg::BallState::SharedPtr msg)
   {
-    // Very simple logic: if ball speed is high -> ask players to defend, else ask to keep formation
-    double speed = std::hypot(msg->vel.vx, msg->vel.vy);
+    // Position-based logic: if the ball is in the opponent half, ask to attack; otherwise defend
     handball_msgs::msg::CoachInstruction inst;
-    if (speed > 2.0) {
-      inst.instr = "DEFEND: ball moving fast";
+    if (msg->pos.x >= 0.0) {
+      inst.instr = "ATTACK: ball in opponent half";
     } else {
-      inst.instr = "MAINTAIN: keep formation";
+      inst.instr = "DEFEND: ball in our half";
     }
     instr_pub_->publish(inst);
 
-    RCLCPP_DEBUG(this->get_logger(), "Published coach instruction from ball_callback: %s", inst.instr.c_str());
+    // RCLCPP_DEBUG(this->get_logger(), "Published coach instruction from ball_callback: %s", inst.instr.c_str());
   }
 
   void player_callback(const handball_msgs::msg::PlayerState::SharedPtr msg)
@@ -88,7 +87,7 @@ private:
     }
     instr_pub_->publish(inst);
 
-    RCLCPP_DEBUG(this->get_logger(), "Published coach instruction from player_callback (id=%u): %s", msg->id, inst.instr.c_str());
+    // RCLCPP_DEBUG(this->get_logger(), "Published coach instruction from player_callback (id=%u): %s", msg->id, inst.instr.c_str());
   }
 
   void request_substitution(const std::string & team, uint8_t outgoing, uint8_t incoming)

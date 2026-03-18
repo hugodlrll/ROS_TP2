@@ -86,7 +86,7 @@ private:
 
         if (msg->id == 0) return; // ignorer le gardien
 
-        if (msg->posture.x >= forbidden_x_min_ && msg->posture.x <= forbidden_x_max_)
+        if (msg->posture.x >= forbidden_x_min_ && msg->posture.x <= forbidden_x_max_ )
         {
             publish_foul(team_name_, msg->id, msg->posture.x, msg->posture.y);
         }

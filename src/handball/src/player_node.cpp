@@ -89,7 +89,7 @@ public:
     tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 
     // Handle parameters.
-    // This code is for parameters that are defined at startup and remain constant during
+    // This code is for parameters that areomega_; defined at startup and remain constant during
     // execution. If changes during execution is necessary, see the ros2 Galactic tutorial.
 
     {
@@ -125,28 +125,28 @@ public:
     ball_pos_vit_received_ = false ;
     auto qos_settings = rclcpp::QoS(rclcpp::KeepLast(1)).best_effort().durability_volatile();
     ball_pos_vit_sub_ = this->create_subscription<handball_msgs::msg::BallState>(
-        "/ball_state",
+        "/ball_pos_vit",
         qos_settings,
         std::bind(&PlayerNode::ball_pos_vit_callback, this, _1)
     );
     coach_instr_received_ = false ;
     qos_settings = rclcpp::QoS(rclcpp::KeepLast(1)).reliable().durability_volatile();
     coach_instr_sub_ = this->create_subscription<handball_msgs::msg::CoachInstruction>(
-        "coach_instruction",
+        "coach_instr",
         qos_settings,
         std::bind(&PlayerNode::coach_instr_callback, this, _1)
     );
     player_control_received_ = false ;
     qos_settings = rclcpp::QoS(rclcpp::KeepLast(1)).reliable().durability_volatile();
     player_control_sub_ = this->create_subscription<handball_msgs::msg::PlayerControl>(
-        "player_control",
+        "player_control_"+team_ + "_" + std::to_string(id_),
         qos_settings,
         std::bind(&PlayerNode::player_control_callback, this, _1)
     );
     whistle_received_ = false ;//referee
     qos_settings = rclcpp::QoS(rclcpp::KeepLast(1)).reliable().durability_volatile();
     whistle_sub_ = this->create_subscription<handball_msgs::msg::Whistle>(
-      "/whistle",
+        "whistle",
         qos_settings,
         std::bind(&PlayerNode::whistle_callback, this, _1)
     );
@@ -158,11 +158,14 @@ public:
         std::bind(&PlayerNode::team_state_callback, this, _1)
     );
 
+    qos_settings = rclcpp::QoS(rclcpp::KeepLast(10));
     // Create publisher for the message id+team+energy to
     // generate visualization messages.
     state_pub_ = this->create_publisher<handball_msgs::msg::PlayerState>("/player_state", qos_settings);
+
+    // Create publisher for the message kick
+    ball_pub_ = this->create_publisher<handball_msgs::msg::BallVelocity>("/ball/kick", qos_settings);
     }
-    
 
     timer_ = this->create_wall_timer(
       std::chrono::milliseconds(period),
@@ -180,7 +183,7 @@ public:
                    std::shared_ptr<handball_msgs::srv::SubstitutionExecution::Response> response)
   {
       if(request->outgoing == id_){
-        energie_ = 100;
+        energie_ = 100;RCLCPP_INFO_STREAM_ONCE(this->get_logger(), "Player running");
         response->set__status(response->DONE);
         RCLCPP_INFO_STREAM(this->get_logger(), "Substitution of player " << id_);
       }
@@ -206,12 +209,12 @@ private:
   
  	void coach_instr_callback(const handball_msgs::msg::CoachInstruction::SharedPtr msg)
   {
-      RCLCPP_INFO_STREAM(this->get_logger(), "coach instr callback" << msg->instr);
+      RCLCPP_INFO_STREAM(this->get_logger(), "coach instr callback " << msg->instr);
   }
 
     void player_control_callback(const handball_msgs::msg::PlayerControl::SharedPtr msg)
   {
-      // RCLCPP_INFO_STREAM(this->get_logger(), "player control callback");
+      RCLCPP_INFO_STREAM(this->get_logger(), "player control callback, MOVE = "<< msg->action);
       if(!player_stop and energie_>0){
         switch(msg->action){
             case 1: //movement
@@ -225,17 +228,30 @@ private:
                     energie_ -= 0.01;
                     ball_vx_ = msg->vel.vx;
                     ball_vy_ = msg->vel.vy;
+                    vx_ = 0;
+                    vy_ = 0;
+                    omega_ = 0;
+                    
                     // Besoin d'une action sur la balle
+                    handball_msgs::msg::BallVelocity ball_kick;
+                    ball_kick.set__vx(ball_vx_);
+                    ball_kick.set__vy(ball_vy_);
+                    ball_pub_->publish(ball_kick);
                 }
                 break;
             default:
+                vx_ = 0;
+                vy_ = 0;
+                omega_ = 0;
+                ball_vx_ = 0;
+                ball_vy_ = 0;
                 break;
         }
       }
   }
 	void whistle_callback(const handball_msgs::msg::Whistle::SharedPtr msg)
   {
-      RCLCPP_INFO_STREAM(this->get_logger(),"whistle callback");
+      RCLCPP_INFO_STREAM(this->get_logger(),"whistle callback");RCLCPP_INFO_STREAM_ONCE(this->get_logger(), "Player running");
       switch(msg->why){
         case 1:
           player_stop = false;
@@ -249,7 +265,6 @@ private:
 
       }
   }
-  
   void team_state_callback(const handball_msgs::msg::PlayerState::SharedPtr msg)
   {
       RCLCPP_INFO_STREAM(this->get_logger(), "team state callback" << msg->team);
@@ -260,11 +275,11 @@ private:
     static handball_msgs::msg::PlayerState player_state ;
     RCLCPP_INFO_STREAM_ONCE(this->get_logger(), "Player running");
     energie_ -= 0.001;
-    x_ +=std::max(std::min(period/1000.0f * vx_,dim_max),dim_min);
-    y_ +=std::max(std::min(period/1000.0f * vy_,dim_max),dim_min);
-    theta_ += period/1000.0f * omega_;
+    x_ +=std::max(std::min((float)period/1000.0f * vx_,1.0f),-1.0f);
+    y_ +=std::max(std::min((float)period/1000.0f * vy_,1.0f),-1.0f);
+    theta_ += (float)period/1000.0f * omega_;
 
-	player_state.id = id_    ;
+    player_state.id = id_;
 	player_state.team  = team_ ;
 	player_state.energie = energie_;
     player_state.posture.x = x_;
@@ -281,7 +296,7 @@ private:
 
     t.header.stamp = this->get_clock()->now();
     t.header.frame_id = "world";
-    t.child_frame_id = "player_" + std::to_string(id_);
+    t.child_frame_id = team_ + "_" + std::to_string(id_);
 
     t.transform.translation.x = x_;
     t.transform.translation.y = y_;
@@ -313,6 +328,7 @@ private:
   rclcpp::Subscription<handball_msgs::msg::Whistle>::SharedPtr whistle_sub_;
   rclcpp::Publisher<handball_msgs::msg::PlayerState>::SharedPtr state_pub_;
   rclcpp::Subscription<handball_msgs::msg::PlayerState>::SharedPtr team_state_sub_;
+  rclcpp::Publisher<handball_msgs::msg::BallVelocity>::SharedPtr ball_pub_;
   rclcpp::TimerBase::SharedPtr timer_;
   std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
 

@@ -5,9 +5,6 @@ from ament_index_python.packages import get_package_share_directory
 import os
 
 def create_team_group(team_color: str):
-    player_0_remappings = []
-    if team_color == "blue":
-        player_0_remappings = [("player_control", "player_0/player_control")]
 
     return GroupAction(
         actions=[
@@ -20,20 +17,19 @@ def create_team_group(team_color: str):
             Node(
                 package="handball",
                 executable="player_node",
-                name="player_0",
+                name=f"{team_color}_0",
                 parameters=[{"team": team_color, "id": 0}],
-                remappings=player_0_remappings,
             ),
             Node(
                 package="handball",
                 executable="player_node",
-                name="player_1",
+                name=f"{team_color}_1",
                 parameters=[{"team": team_color, "id": 1}],
             ),
             Node(
                 package="handball",
                 executable="player_node",
-                name="player_2",
+                name=f"{team_color}_2",
                 parameters=[{"team": team_color, "id": 2}],
             ),
         ]
@@ -89,7 +85,6 @@ def generate_launch_description():
                 package="handball",
                 executable="controller",
                 name="controller",
-                remappings=[("player_control", "/blue/player_0/player_control")],
             ),
 
         ]
